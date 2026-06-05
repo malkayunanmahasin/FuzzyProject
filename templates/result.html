@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Hasil Analisis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<section class="page">
+  <div class="panel glass result">
+    <span class="badge">✅ Hasil Analisis</span>
+
+    <div class="icon result-{{ color_class }}">{{ icon }}</div>
+    <h2 class="result-{{ color_class }}">{{ status }}</h2>
+    <p>{{ desc }}</p>
+
+    <div class="gauge-box">
+      <div class="gauge-label">
+        <span>Kurang Ideal</span>
+        <span>Ideal</span>
+        <span>Sangat Ideal</span>
+      </div>
+
+      <div class="bmi-gauge">
+        <div class="gauge-pointer" data-pointer="{{ pointer }}"></div>
+      </div>
+
+      <p class="bmi-score">BMI kamu: <b>{{ bmi }}</b></p>
+      <p class="bmi-score" style="font-size: 13px; color: #bfdbfe; margin-top: 8px;">Indikator ini menampilkan skor keidealan tubuh (0–100), bukan nilai BMI murni.</p>
+    </div>
+
+    <div class="result-grid">
+      <div class="mini-card">
+        <h3>📏 Data Tubuh</h3>
+        <p>BB: {{ bb }} kg</p>
+        <p>TB: {{ tb }} cm</p>
+        <p>Umur: {{ umur }} tahun</p>
+      </div>
+
+      <div class="mini-card">
+        <h3>🏃 Aktivitas</h3>
+        <p>{{ aktivitas }}</p>
+      </div>
+
+      <div class="mini-card">
+        <h3>💡 Saran</h3>
+        <p>{{ advice }}</p>
+      </div>
+    </div>
+
+    <div class="fuzzy-box">
+      <h3>🧠 Derajat Keanggotaan Sugeno</h3>
+
+      <div class="fuzzy-row">
+        <span>Belum Ideal</span>
+        <div class="fuzzy-track">
+          <div data-bar="{{ belum }}"></div>
+        </div>
+        <b>{{ belum }}</b>
+      </div>
+
+      <div class="fuzzy-row">
+        <span>Kurang Ideal</span>
+        <div class="fuzzy-track">
+          <div data-bar="{{ kurang }}"></div>
+        </div>
+        <b>{{ kurang }}</b>
+      </div>
+
+      <div class="fuzzy-row">
+        <span>Ideal</span>
+        <div class="fuzzy-track">
+          <div data-bar="{{ ideal }}"></div>
+        </div>
+        <b>{{ ideal }}</b>
+      </div>
+
+      <div class="fuzzy-row">
+        <span>Tidak Ideal</span>
+        <div class="fuzzy-track">
+          <div data-bar="{{ tidak }}"></div>
+        </div>
+        <b>{{ tidak }}</b>
+      </div>
+    </div>
+
+    <a href="/input" class="btn">Ulangi</a>
+    <a href="/" class="btn secondary">Beranda</a>
+    <a href="/learn" class="btn secondary">Pelajari Selengkapnya</a>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pointer = document.querySelector('.gauge-pointer[data-pointer]');
+    if (pointer) {
+      pointer.style.left = `${parseFloat(pointer.getAttribute('data-pointer'))}%`;
+    }
+
+    document.querySelectorAll('.fuzzy-track div[data-bar]').forEach((bar) => {
+      const value = parseFloat(bar.getAttribute('data-bar'));
+      bar.style.width = `${value * 100}%`;
+    });
+  });
+</script>
+
+</body>
+</html>

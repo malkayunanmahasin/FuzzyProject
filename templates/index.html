@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>BodyBalance</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-card glass">
+
+    <div>
+      <span class="badge">🌑 Sugeno Health System</span>
+
+      <h1><span>BodyBalance</span></h1>
+
+      <p>
+        Sistem ini menggunakan pendekatan <b>Sugeno</b> untuk menganalisis
+        keseimbangan tubuh berdasarkan <b>berat badan, tinggi badan, umur, dan aktivitas</b>.
+      </p>
+
+      <div style="margin-top: 10px;">
+        <p style="font-size: 14px; color:#94a3b8;">
+          ⚡ Output: Status tubuh + Saran + Visual BMI + Derajat Sugeno
+        </p>
+      </div>
+
+      <a href="/input" class="btn">Mulai Analisis</a>
+      <a href="/learn" class="btn secondary">Pelajari Dulu</a>
+    </div>
+
+    <div class="illustration">
+      ⚖️
+    </div>
+
+  </div>
+</section>
+
+<section class="page" style="padding-top: 0;">
+  <div class="panel glass" style="text-align:center;">
+
+    <h2>Kenapa pakai BodyBalance?</h2>
+
+    <div class="result-grid">
+
+      <div class="mini-card">
+        <h3>🧠 Sugeno Logic</h3>
+        <p>Tidak hanya angka kaku, tapi pakai derajat keanggotaan.</p>
+      </div>
+
+      <div class="mini-card">
+        <h3>📊 Visual BMI</h3>
+        <p>Dilengkapi gauge dan pointer interaktif.</p>
+      </div>
+
+      <div class="mini-card">
+        <h3>⚡ Interaktif</h3>
+        <p>UI modern dengan animasi dan feedback langsung.</p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>

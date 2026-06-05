@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Input Data</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<section class="page">
+  <form action="/result" method="POST" class="panel glass">
+    <span class="badge">📊 Tahap 1 - Sistem Sugeno</span>
+    <h2>Analisis Keseimbangan Tubuh</h2>
+    <p>Masukkan berat badan, tinggi badan, umur, dan aktivitas harian kamu.</p>
+
+    <div class="input-card">
+      <label>
+        Berat Badan
+        <span><span id="bbVal">55</span> kg</span>
+      </label>
+      <input type="range" name="bb" id="bb" min="35" max="120" value="55">
+    </div>
+
+    <div class="input-card">
+      <label>
+        Tinggi Badan
+        <span><span id="tbVal">160</span> cm</span>
+      </label>
+      <input type="range" name="tb" id="tb" min="130" max="200" value="160">
+    </div>
+
+    <div class="input-card">
+      <label>
+        Umur
+        <span><span id="umurVal">20</span> tahun</span>
+      </label>
+      <input type="range" name="umur" id="umur" min="10" max="80" value="20">
+    </div>
+
+    <div class="input-card">
+      <label>Aktivitas Harian</label>
+      <select name="aktivitas" required>
+        <option value="rendah">Rendah</option>
+        <option value="sedang">Sedang</option>
+        <option value="tinggi">Tinggi</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn">Analisis Sekarang</button>
+    <a href="/" class="btn secondary">Kembali</a>
+  </form>
+</section>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
