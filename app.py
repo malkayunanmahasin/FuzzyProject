@@ -54,94 +54,84 @@ def result():
     bmi = bb / (tb_m * tb_m)
 
     # =========================
-    # 1. FUZZIFIKASI BMI
-    # Menghitung derajat keanggotaan (0.0 - 1.0)
+    # 1. FUZZIFIKASI BMI (3 Parameter: Masing-masing 1 kurva berurutan)
     # =========================
-    belum_ideal = turun(bmi, 17, 18.5)
-    kurang_ideal = segitiga(bmi, 18, 20, 22)
-    ideal = segitiga(bmi, 21, 23, 25)
-    tidak_ideal = naik(bmi, 24.5, 30)
+    # Tidak Ideal: Kurva turun di sebelah kiri
+    tidak_ideal_val = turun(bmi, 18, 22)
+    
+    # Ideal: Kurva segitiga di tengah (puncak di 22)
+    ideal_val = segitiga(bmi, 18, 22, 26)
+    
+    # Sangat Ideal: Kurva naik di sebelah kanan
+    sangat_ideal_val = naik(bmi, 22, 26)
 
-    # Hanya digunakan untuk mendeteksi "arah" fisik (Kurus atau Gemuk) untuk saran
-    kategori_sugeno = {
-        "Kurus": belum_ideal,
-        "Mendekati Kurus": kurang_ideal,
-        "Proporsional": ideal,
-        "Gemuk": tidak_ideal
-    }
-    arah_fisik = max(kategori_sugeno, key=kategori_sugeno.get)
+    # Menentukan arah fisik untuk saran
+    if bmi < 20:
+        arah_fisik = "Kurus"
+    elif bmi > 24:
+        arah_fisik = "Gemuk"
+    else:
+        arah_fisik = "Proporsional"
 
     # =========================
     # 2. INFERENSI SUGENO ORDE-NOL (Rules)
-    # Menentukan nilai konstanta (Z) dari skala 0-100 untuk Skor Keidealan
     # =========================
     # Konstanta dasar jika aktivitas sedang/normal
-    z_belum = 40
-    z_kurang = 70
-    z_ideal = 90
     z_tidak = 30
+    z_ideal = 70
+    z_sangat = 100
 
-    # Rule intervensi Aktivitas terhadap nilai konstanta (Z)
+    # Rule intervensi Aktivitas
     if aktivitas == "tinggi":
-        z_belum += 10
-        z_kurang += 10
-        z_ideal = 100   # Maksimal skor 100
         z_tidak += 10
+        z_ideal += 10
+        z_sangat = 100
     elif aktivitas == "rendah":
-        z_belum -= 10
-        z_kurang -= 10
-        z_ideal -= 10
         z_tidak -= 15
+        z_ideal -= 10
+        z_sangat -= 10
 
     # =========================
     # 3. DEFUZZIFIKASI SUGENO (Weighted Average)
     # =========================
-    # Rumus: ((Derajat1 * Z1) + (Derajat2 * Z2) ... ) / (Total Derajat)
-    pembilang = (belum_ideal * z_belum) + (kurang_ideal * z_kurang) + (ideal * z_ideal) + (tidak_ideal * z_tidak)
-    penyebut = belum_ideal + kurang_ideal + ideal + tidak_ideal
+    pembilang = (tidak_ideal_val * z_tidak) + (ideal_val * z_ideal) + (sangat_ideal_val * z_sangat)
+    penyebut = tidak_ideal_val + ideal_val + sangat_ideal_val
 
-    # Menghindari error pembagian dengan nol
     if penyebut > 0:
         skor_sugeno = pembilang / penyebut
     else:
         skor_sugeno = 0
 
     # =========================
-    # 4. HASIL BERDASARKAN SKOR SUGENO
+    # 4. HASIL BERDASARKAN SKOR SUGENO (3 Kategori)
     # =========================
-    if skor_sugeno >= 85:
+    if skor_sugeno >= 80:
         status = "Sangat Ideal"
         icon = "🟢"
         color_class = "green"
-    elif skor_sugeno >= 65:
-        status = "Mendekati Ideal"
+    elif skor_sugeno >= 50:
+        status = "Ideal"
         icon = "🟡"
         color_class = "yellow"
-    elif skor_sugeno >= 45:
-        status = "Kurang Ideal"
-        icon = "🟠"
-        color_class = "yellow"
     else:
-        status = "Sangat Tidak Ideal"
+        status = "Tidak Ideal"
         icon = "🔴"
         color_class = "red"
 
-    # Peta posisi jarum agar sesuai dengan status akhir, bukan nilai skor mentah
     pointer_map = {
-        "Sangat Tidak Ideal": 10,
-        "Kurang Ideal": 35,
-        "Mendekati Ideal": 60,
-        "Sangat Ideal": 90,
+        "Tidak Ideal": 15,
+        "Ideal": 50,
+        "Sangat Ideal": 85,
     }
     pointer = pointer_map.get(status, 50)
 
-    # Menyematkan langsung nilai Sugeno ke teks deskripsi web
+    # Deskripsi web
     desc = f"📊 Skor Keidealan: {round(skor_sugeno, 1)} / 100. "
     
     if arah_fisik == "Proporsional":
          desc += "Tinggi dan berat badan kamu berada dalam kondisi yang seimbang."
          advice = "Pertahankan pola makan dan olahraga rutin."
-    elif arah_fisik == "Kurus" or arah_fisik == "Mendekati Kurus":
+    elif arah_fisik == "Kurus":
          desc += "Skor ini didapat karena tubuh kamu cenderung kekurangan berat badan."
          advice = "Tingkatkan asupan nutrisi, protein, dan kalori sehat secara bertahap."
     else:
@@ -156,6 +146,19 @@ def result():
     elif umur >= 35:
         desc += " Pada usia ini, metabolisme tubuh cenderung mulai menurun sehingga pola hidup perlu lebih dijaga."
 
+    # =========================
+    # GENERATE DATA GRAFIK CHART.JS
+    # =========================
+    bmi_labels = [x * 0.5 for x in range(20, 81)] # dari 10.0 sampai 40.0
+    data_tidak = []
+    data_ideal = []
+    data_sangat = []
+    
+    for x in bmi_labels:
+        data_tidak.append(round(turun(x, 18, 22), 2))
+        data_ideal.append(round(segitiga(x, 18, 22, 26), 2))
+        data_sangat.append(round(naik(x, 22, 26), 2))
+
     return render_template(
         "result.html",
         bb=bb,
@@ -169,10 +172,13 @@ def result():
         advice=advice,
         pointer=round(pointer, 1), 
         color_class=color_class,
-        belum=round(belum_ideal, 2),
-        kurang=round(kurang_ideal, 2),
-        ideal=round(ideal, 2),
-        tidak=round(tidak_ideal, 2)
+        tidak_ideal=round(tidak_ideal_val, 2),
+        ideal=round(ideal_val, 2),
+        sangat_ideal=round(sangat_ideal_val, 2),
+        bmi_labels=bmi_labels,
+        data_tidak=data_tidak,
+        data_ideal=data_ideal,
+        data_sangat=data_sangat
     )
 
 if __name__ == "__main__":

@@ -1,109 +1,180 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <title>Hasil Analisis</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<section class="page">
-  <div class="panel glass result">
-    <span class="badge">✅ Hasil Analisis</span>
+  <section class="page">
+    <div class="panel glass result">
+      <span class="badge">✅ Hasil Analisis</span>
 
-    <div class="icon result-{{ color_class }}">{{ icon }}</div>
-    <h2 class="result-{{ color_class }}">{{ status }}</h2>
-    <p>{{ desc }}</p>
+      <div class="icon result-{{ color_class }}">{{ icon }}</div>
+      <h2 class="result-{{ color_class }}">{{ status }}</h2>
+      <p>{{ desc }}</p>
 
-    <div class="gauge-box">
-      <div class="gauge-label">
-        <span>Kurang Ideal</span>
-        <span>Ideal</span>
-        <span>Sangat Ideal</span>
+      <div class="gauge-box">
+        <div class="gauge-label">
+          <span>Tidak Ideal</span>
+          <span>Ideal</span>
+          <span>Sangat Ideal</span>
+        </div>
+
+        <div class="bmi-gauge">
+          <div class="gauge-pointer" data-pointer="{{ pointer }}"></div>
+        </div>
+
+        <p class="bmi-score">BMI kamu: <b>{{ bmi }}</b></p>
+        <p class="bmi-score" style="font-size: 13px; color: #bfdbfe; margin-top: 8px;">Indikator ini menampilkan skor
+          keidealan tubuh (0–100), bukan nilai BMI murni.</p>
       </div>
 
-      <div class="bmi-gauge">
-        <div class="gauge-pointer" data-pointer="{{ pointer }}"></div>
+      <div class="result-grid">
+        <div class="mini-card">
+          <h3>📏 Data Tubuh</h3>
+          <p>BB: {{ bb }} kg</p>
+          <p>TB: {{ tb }} cm</p>
+          <p>Umur: {{ umur }} tahun</p>
+        </div>
+
+        <div class="mini-card">
+          <h3>🏃 Aktivitas</h3>
+          <p>{{ aktivitas }}</p>
+        </div>
+
+        <div class="mini-card">
+          <h3>💡 Saran</h3>
+          <p>{{ advice }}</p>
+        </div>
       </div>
 
-      <p class="bmi-score">BMI kamu: <b>{{ bmi }}</b></p>
-      <p class="bmi-score" style="font-size: 13px; color: #bfdbfe; margin-top: 8px;">Indikator ini menampilkan skor keidealan tubuh (0–100), bukan nilai BMI murni.</p>
+      <div class="fuzzy-box">
+        <h3>🧠 Derajat Keanggotaan Sugeno</h3>
+
+        <div class="fuzzy-row">
+          <span>Tidak Ideal</span>
+          <div class="fuzzy-track">
+            <div data-bar="{{ tidak_ideal }}"></div>
+          </div>
+          <b>{{ tidak_ideal }}</b>
+        </div>
+
+        <div class="fuzzy-row">
+          <span>Ideal</span>
+          <div class="fuzzy-track">
+            <div data-bar="{{ ideal }}"></div>
+          </div>
+          <b>{{ ideal }}</b>
+        </div>
+
+        <div class="fuzzy-row">
+          <span>Sangat Ideal</span>
+          <div class="fuzzy-track">
+            <div data-bar="{{ sangat_ideal }}"></div>
+          </div>
+          <b>{{ sangat_ideal }}</b>
+        </div>
+      </div>
+
+      <div class="fuzzy-box" style="margin-top: 20px;">
+        <h3>📈 Grafik Himpunan Fuzzy (BMI)</h3>
+        <canvas id="fuzzyChart"></canvas>
+      </div>
+
+      <a href="/input" class="btn">Ulangi</a>
+      <a href="/" class="btn secondary">Beranda</a>
+      <a href="/learn" class="btn secondary">Pelajari Selengkapnya</a>
     </div>
+  </section>
 
-    <div class="result-grid">
-      <div class="mini-card">
-        <h3>📏 Data Tubuh</h3>
-        <p>BB: {{ bb }} kg</p>
-        <p>TB: {{ tb }} cm</p>
-        <p>Umur: {{ umur }} tahun</p>
-      </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const pointer = document.querySelector('.gauge-pointer[data-pointer]');
+      if (pointer) {
+        pointer.style.left = `${parseFloat(pointer.getAttribute('data-pointer'))}%`;
+      }
 
-      <div class="mini-card">
-        <h3>🏃 Aktivitas</h3>
-        <p>{{ aktivitas }}</p>
-      </div>
+      document.querySelectorAll('.fuzzy-track div[data-bar]').forEach((bar) => {
+        const value = parseFloat(bar.getAttribute('data-bar'));
+        bar.style.width = `${value * 100}%`;
+      });
 
-      <div class="mini-card">
-        <h3>💡 Saran</h3>
-        <p>{{ advice }}</p>
-      </div>
-    </div>
+      const ctx = document.getElementById('fuzzyChart');
+      if (ctx) {
+        const userBmi = {{ bmi }
+      };
+      const labels = {{ bmi_labels | tojson | safe
+    }};
 
-    <div class="fuzzy-box">
-      <h3>🧠 Derajat Keanggotaan Sugeno</h3>
-
-      <div class="fuzzy-row">
-        <span>Belum Ideal</span>
-        <div class="fuzzy-track">
-          <div data-bar="{{ belum }}"></div>
-        </div>
-        <b>{{ belum }}</b>
-      </div>
-
-      <div class="fuzzy-row">
-        <span>Kurang Ideal</span>
-        <div class="fuzzy-track">
-          <div data-bar="{{ kurang }}"></div>
-        </div>
-        <b>{{ kurang }}</b>
-      </div>
-
-      <div class="fuzzy-row">
-        <span>Ideal</span>
-        <div class="fuzzy-track">
-          <div data-bar="{{ ideal }}"></div>
-        </div>
-        <b>{{ ideal }}</b>
-      </div>
-
-      <div class="fuzzy-row">
-        <span>Tidak Ideal</span>
-        <div class="fuzzy-track">
-          <div data-bar="{{ tidak }}"></div>
-        </div>
-        <b>{{ tidak }}</b>
-      </div>
-    </div>
-
-    <a href="/input" class="btn">Ulangi</a>
-    <a href="/" class="btn secondary">Beranda</a>
-    <a href="/learn" class="btn secondary">Pelajari Selengkapnya</a>
-  </div>
-</section>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const pointer = document.querySelector('.gauge-pointer[data-pointer]');
-    if (pointer) {
-      pointer.style.left = `${parseFloat(pointer.getAttribute('data-pointer'))}%`;
+    const allDatasets = [
+      {
+        label: 'Tidak Ideal',
+        data: {{ data_tidak | tojson | safe }},
+    borderColor: '#f87171',
+      backgroundColor: 'rgba(248, 113, 113, 0.1)',
+        fill: true,
+          tension: 0.1,
+            pointRadius: 0,
+              activeVal: { { tidak_ideal } }
+        },
+    {
+      label: 'Ideal',
+        data: { { data_ideal | tojson | safe } },
+      borderColor: '#fbbf24',
+        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+          fill: true,
+            tension: 0.1,
+              pointRadius: 0,
+                activeVal: { { ideal } }
+    },
+    {
+      label: 'Sangat Ideal',
+        data: { { data_sangat | tojson | safe } },
+      borderColor: '#4ade80',
+        backgroundColor: 'rgba(74, 222, 128, 0.1)',
+          fill: true,
+            tension: 0.1,
+              pointRadius: 0,
+                activeVal: { { sangat_ideal } }
     }
+      ];
 
-    document.querySelectorAll('.fuzzy-track div[data-bar]').forEach((bar) => {
-      const value = parseFloat(bar.getAttribute('data-bar'));
-      bar.style.width = `${value * 100}%`;
+    // Filter dataset yang nilainya > 0
+    const activeDatasets = allDatasets.filter(ds => ds.activeVal > 0);
+
+    new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: activeDatasets
+      },
+      options: {
+        responsive: true,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 1.1,
+            title: { display: true, text: 'Derajat Keanggotaan' }
+          },
+          x: {
+            title: { display: true, text: 'Nilai BMI' }
+          }
+        }
+      }
     });
+    }
   });
-</script>
+  </script>
 
 </body>
+
 </html>
